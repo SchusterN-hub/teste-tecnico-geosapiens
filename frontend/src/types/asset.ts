@@ -1,15 +1,37 @@
-export type AssetCategory = 'Computador' | 'Monitor' | 'Periférico' | 'Rede' | 'Servidor';
-export type AssetStatus = 'Ativo' | 'Em Manutenção' | 'Inativo' | 'Descartado';
+export type AssetStatus =
+  | "Disponível"
+  | "Em uso"
+  | "Em manutenção"
+  | "Descartado";
+
+export const STATUSES: AssetStatus[] = [
+  "Disponível",
+  "Em uso",
+  "Em manutenção",
+  "Descartado",
+];
+
+export type AssetCategory =
+  | "Computador"
+  | "Monitor"
+  | "Periférico"
+  | "Rede"
+  | "Servidor";
+
+export const CATEGORIES: AssetCategory[] = [
+  "Computador",
+  "Monitor",
+  "Periférico",
+  "Rede",
+  "Servidor",
+];
 
 export interface Asset {
-  id: string;
+  id: string | number; // Aceita string (UUID do Front) ou number (ID do Java)
   name: string;
   serialNumber: string;
-  category: AssetCategory;
+  category: string;
   status: AssetStatus;
   acquisitionDate: string;
   description?: string;
 }
-
-export const CATEGORIES: AssetCategory[] = ['Computador', 'Monitor', 'Periférico', 'Rede', 'Servidor'];
-export const STATUSES: AssetStatus[] = ['Ativo', 'Em Manutenção', 'Inativo', 'Descartado'];
