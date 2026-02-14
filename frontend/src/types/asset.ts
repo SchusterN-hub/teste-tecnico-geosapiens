@@ -27,10 +27,10 @@ export const CATEGORIES: AssetCategory[] = [
 ];
 
 export interface Asset {
-  id: string | number; // Aceita string (UUID do Front) ou number (ID do Java)
+  id: number;
   name: string;
   serialNumber: string;
-  category: string;
+  category: AssetCategory;
   status: AssetStatus;
   acquisitionDate: string;
   description?: string;

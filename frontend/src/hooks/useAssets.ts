@@ -35,6 +35,7 @@ export function useAssets() {
     try {
       const response = await fetch("http://localhost:8080/assets");
       if (!response.ok) throw new Error("Erro no servidor ao buscar os ativos");
+
       const data = await response.json();
 
       const formattedAssets = data.map((item) => ({
@@ -73,6 +74,7 @@ export function useAssets() {
       try {
         const payload = {
           ...data,
+
           status: statusToBackend[data.status as string] || "AVAILABLE",
         };
 
@@ -97,7 +99,7 @@ export function useAssets() {
   );
 
   const updateAsset = useCallback(
-    async (id: string | number, data: Omit<Asset, "id">) => {
+    async (id: number, data: Omit<Asset, "id">) => {
       try {
         const payload = {
           ...data,
@@ -120,10 +122,15 @@ export function useAssets() {
     [fetchAssets],
   );
 
-  const deleteAsset = useCallback(async (id: string | number) => {
-    if (!confirm("Tem certeza?")) return;
+  const deleteAsset = useCallback(async (id: number) => {
+    if (!confirm("Tem certeza que deseja excluir este ativo?")) return;
     try {
-      await fetch(`http://localhost:8080/assets/${id}`, { method: "DELETE" });
+      const response = await fetch(`http://localhost:8080/assets/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Falha ao deletar");
+
       setAssets((prev) => prev.filter((a) => a.id !== id));
     } catch (error) {
       console.error(error);
