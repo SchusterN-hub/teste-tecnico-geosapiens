@@ -1,5 +1,11 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
+import axios from "axios";
+import { toast } from "sonner";
 import { Asset, AssetCategory, AssetStatus } from "@/types/asset";
+
+const api = axios.create({
+  baseURL: "http://localhost:8080/assets",
+});
 
 const statusToBackend: Record<string, string> = {
   Disponível: "AVAILABLE",
@@ -33,19 +39,17 @@ export function useAssets() {
   const fetchAssets = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:8080/assets");
-      if (!response.ok) throw new Error("Erro no servidor ao buscar os ativos");
+      const response = await api.get("");
 
-      const data = await response.json();
-
-      const formattedAssets = data.map((item) => ({
+      const formattedAssets = response.data.map((item) => ({
         ...item,
         status: statusToFrontend[item.status] || item.status,
       }));
 
       setAssets(formattedAssets);
     } catch (error) {
-      console.error("Erro no fetch:", error);
+      console.error("Erro ao buscar ativos:", error);
+      toast.error("Não foi possível carregar a lista de ativos.");
     } finally {
       setIsLoading(false);
     }
@@ -71,71 +75,69 @@ export function useAssets() {
 
   const addAsset = useCallback(
     async (data: Omit<Asset, "id">) => {
-      try {
-        const payload = {
-          ...data,
+      const payload = {
+        ...data,
+        status: statusToBackend[data.status as string] || "AVAILABLE",
+      };
 
-          status: statusToBackend[data.status as string] || "AVAILABLE",
-        };
+      const promise = api.post("", payload);
 
-        const response = await fetch("http://localhost:8080/assets", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+      toast.promise(promise, {
+        loading: "Salvando ativo...",
+        success: () => {
+          fetchAssets();
+          return "Ativo cadastrado com sucesso!";
+        },
+        error: (err) => {
+          return err.response?.data || "Erro ao salvar ativo.";
+        },
+      });
 
-        if (!response.ok) {
-          const txt = await response.text();
-          throw new Error(txt);
-        }
-
-        await fetchAssets();
-      } catch (error) {
-        console.error(error);
-        alert("Erro ao salvar. Verifique se o Nº de Série já existe.");
-      }
+      return await promise;
     },
     [fetchAssets],
   );
 
   const updateAsset = useCallback(
     async (id: number, data: Omit<Asset, "id">) => {
-      try {
-        const payload = {
-          ...data,
-          status: statusToBackend[data.status as string] || "AVAILABLE",
-        };
+      const payload = {
+        ...data,
+        status: statusToBackend[data.status as string] || "AVAILABLE",
+      };
 
-        const response = await fetch(`http://localhost:8080/assets/${id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+      const promise = api.put(`/${id}`, payload);
 
-        if (!response.ok) throw new Error("Erro ao atualizar");
-        await fetchAssets();
-      } catch (error) {
-        console.error(error);
-        alert("Erro ao atualizar ativo.");
-      }
+      toast.promise(promise, {
+        loading: "Atualizando ativo...",
+        success: () => {
+          fetchAssets();
+          return "Ativo atualizado com sucesso!";
+        },
+        error: (err) => {
+          return err.response?.data || "Erro ao atualizar ativo.";
+        },
+      });
+
+      return await promise;
     },
     [fetchAssets],
   );
 
   const deleteAsset = useCallback(async (id: number) => {
-    if (!confirm("Tem certeza que deseja excluir este ativo?")) return;
-    try {
-      const response = await fetch(`http://localhost:8080/assets/${id}`, {
-        method: "DELETE",
-      });
+    const promise = api.delete(`/${id}`);
 
-      if (!response.ok) throw new Error("Falha ao deletar");
+    toast.promise(promise, {
+      loading: "Excluindo...",
+      success: () => {
+        setAssets((prev) => prev.filter((a) => a.id !== id));
+        return "Ativo excluído com sucesso!";
+      },
+      error: (err) => {
+        return err.response?.data || "Erro ao excluir ativo.";
+      },
+    });
 
-      setAssets((prev) => prev.filter((a) => a.id !== id));
-    } catch (error) {
-      console.error(error);
-      alert("Erro ao excluir.");
-    }
+    return await promise;
   }, []);
 
   const stats = useMemo(
@@ -156,7 +158,17 @@ export function useAssets() {
     addAsset,
     updateAsset,
     deleteAsset,
-    stats,
+
+    stats: useMemo(
+      () => ({
+        total: assets.length,
+        active: assets.filter((a) => a.status === "Em uso").length,
+        maintenance: assets.filter((a) => a.status === "Em manutenção").length,
+        inactive: assets.filter((a) => a.status === "Disponível").length,
+        disposed: assets.filter((a) => a.status === "Descartado").length,
+      }),
+      [assets],
+    ),
     isLoading,
   };
 }

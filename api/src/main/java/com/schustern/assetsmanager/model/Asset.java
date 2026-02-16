@@ -24,15 +24,20 @@ public class Asset {
     @Enumerated(EnumType.STRING)
     private AssetStatus status;
 
+    @Column(length = 500)
+    private String description;
+
     public Asset() {
     }
 
-    public Asset(String name, String serialNumber, LocalDate acquisitionDate, String category, AssetStatus status) {
+    public Asset(String name, String serialNumber, LocalDate acquisitionDate, String category, AssetStatus status,
+            String description) {
         this.name = name;
         this.serialNumber = serialNumber;
         this.acquisitionDate = acquisitionDate;
         this.category = category;
         this.status = status;
+        this.description = description;
     }
 
     public Long getId() {
@@ -81,5 +86,13 @@ public class Asset {
 
     public void setStatus(AssetStatus status) {
         this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -8,7 +8,6 @@ import { AssetTable } from "@/components/AssetTable";
 import { AssetFormDialog } from "@/components/AssetFormDialog";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 
 const Index = () => {
   const {
@@ -22,9 +21,7 @@ const Index = () => {
   } = useAssets();
 
   const [formOpen, setFormOpen] = useState(false);
-
   const [editingAsset, setEditingAsset] = useState<Partial<Asset> | null>(null);
-
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const handleEdit = (asset: Asset) => {
@@ -38,31 +35,35 @@ const Index = () => {
     setEditingAsset({
       ...assetData,
       name: `${assetData.name} - Cópia`,
+      serialNumber: assetData.serialNumber,
     });
     setFormOpen(true);
   };
 
-  const handleSave = (data: Omit<Asset, "id">) => {
-    if (editingAsset?.id) {
-      updateAsset(editingAsset.id, data);
-      toast.success("Ativo atualizado com sucesso!");
-    } else {
-      addAsset(data);
-      toast.success("Ativo cadastrado com sucesso!");
+  const handleSave = async (data: Omit<Asset, "id">) => {
+    try {
+      if (editingAsset?.id) {
+        await updateAsset(editingAsset.id, data);
+      } else {
+        await addAsset(data);
+      }
+
+      setFormOpen(false);
+      setEditingAsset(null);
+    } catch (error) {
+      console.log("Erro mantendo modal aberto para correção");
     }
   };
 
   const handleDelete = () => {
     if (deleteId !== null) {
       deleteAsset(deleteId);
-      toast.success("Ativo excluído com sucesso!");
       setDeleteId(null);
     }
   };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -91,7 +92,6 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Content */}
       <main className="container mx-auto px-4 py-6 space-y-6">
         <StatsCards stats={stats} />
         <AssetFilters filters={filters} onChange={setFilters} />
@@ -104,7 +104,6 @@ const Index = () => {
         />
       </main>
 
-      {/* Dialogs */}
       <AssetFormDialog
         open={formOpen}
         onClose={() => {

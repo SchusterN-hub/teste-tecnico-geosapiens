@@ -25,7 +25,6 @@ public class AssetController {
     // POST
     @PostMapping
     public ResponseEntity<?> createAsset(@RequestBody Asset asset) {
-        // Validação simples: Checa se o Serial já existe
         if (repository.existsBySerialNumber(asset.getSerialNumber())) {
             return ResponseEntity.badRequest().body("Erro: Já existe um ativo com este Número de Série.");
         }
@@ -41,6 +40,8 @@ public class AssetController {
                     asset.setName(assetAtualizado.getName());
                     asset.setCategory(assetAtualizado.getCategory());
                     asset.setAcquisitionDate(assetAtualizado.getAcquisitionDate());
+                    asset.setSerialNumber(assetAtualizado.getSerialNumber());
+                    asset.setDescription(assetAtualizado.getDescription());
                     asset.setStatus(assetAtualizado.getStatus());
                     Asset atualizado = repository.save(asset);
                     return ResponseEntity.ok(atualizado);

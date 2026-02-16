@@ -48,7 +48,7 @@ type FormData = z.infer<typeof assetSchema>;
 interface AssetFormDialogProps {
   open: boolean;
   onClose: () => void;
-  onSave: (data: Omit<Asset, "id">) => void;
+  onSave: (data: Omit<Asset, "id">) => Promise<void>;
   asset?: Partial<Asset> | null;
 }
 
@@ -94,9 +94,8 @@ export function AssetFormDialog({
     }
   }, [open, asset, form]);
 
-  const handleSubmit = (data: FormData) => {
-    onSave(data as Omit<Asset, "id">);
-    onClose();
+  const handleSubmit = async (data: FormData) => {
+    await onSave(data as Omit<Asset, "id">);
   };
 
   const isEditing = !!asset?.id;
