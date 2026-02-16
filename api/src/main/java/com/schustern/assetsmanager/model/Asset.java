@@ -1,6 +1,9 @@
 package com.schustern.assetsmanager.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Entity
@@ -12,19 +15,26 @@ public class Asset {
     private Long id;
 
     @Column(nullable = false)
+    @NotBlank(message = "O nome do ativo é obrigatório")
+    @Size(min = 2, message = "O nome deve ter pelo menos 2 caracteres")
     private String name;
 
     @Column(nullable = false, unique = true)
+    @NotBlank(message = "O número de série é obrigatório")
     private String serialNumber;
 
+    @NotNull(message = "A data de aquisição é obrigatória")
     private LocalDate acquisitionDate;
 
+    @NotBlank(message = "A categoria é obrigatória")
     private String category;
 
+    @NotNull(message = "O status é obrigatório")
     @Enumerated(EnumType.STRING)
     private AssetStatus status;
 
     @Column(length = 500)
+    @Size(max = 500, message = "A descrição não pode exceder 500 caracteres")
     private String description;
 
     public Asset() {

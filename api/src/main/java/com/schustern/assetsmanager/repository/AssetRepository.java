@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AssetRepository extends JpaRepository<Asset, Long> {
     boolean existsBySerialNumber(String serialNumber);
+
+    boolean existsBySerialNumberAndIdNot(String serialNumber, Long id);
 }
