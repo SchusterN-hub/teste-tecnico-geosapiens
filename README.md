@@ -23,8 +23,8 @@ A forma mais simples e recomendada de executar a aplicação é utilizando o **D
     - docker-compose up --build
 
 3.  Aguarde o build terminar. Assim que os containers estiverem rodando, você pode acessar o sistema nesses links:
-    - **Frontend (Link principal/Aplicação):** [http://localhost:3000]
-    - **Backend (API):** [http://localhost:8080/assets]
+    - **Frontend (Link principal/Aplicação):** [http://localhost:3000](http://localhost:3000)
+    - **Backend (API):** [http://localhost:8080/assets](http://localhost:8080/assets)
 
 ---
 
