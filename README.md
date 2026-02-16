@@ -1,4 +1,6 @@
-# Gerenciamento de ativos - Desafio Técnico GeoSapiens
+# Asset manager - Desafio Técnico GeoSapiens
+
+![Print do sistema](docs/dashboard-preview.png)
 
 Este projeto é uma aplicação Full Stack para gerenciamento de ativos corporativos (computadores, monitores, etc.), desenvolvida como parte do teste técnico para a GeoSapiens.
 
