@@ -37,9 +37,7 @@ import { Button } from "@/components/ui/button";
 const assetSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   serialNumber: z.string().min(3, "Número de série obrigatório"),
-
   category: z.enum(["Computador", "Monitor", "Periférico", "Rede", "Servidor"]),
-
   status: z.enum(["Disponível", "Em uso", "Em manutenção", "Descartado"]),
   acquisitionDate: z.string().min(1, "Data de aquisição obrigatória"),
   description: z.string().optional(),
@@ -51,7 +49,7 @@ interface AssetFormDialogProps {
   open: boolean;
   onClose: () => void;
   onSave: (data: Omit<Asset, "id">) => void;
-  asset?: Asset | null;
+  asset?: Partial<Asset> | null;
 }
 
 export function AssetFormDialog({
@@ -76,11 +74,11 @@ export function AssetFormDialog({
     if (open) {
       if (asset) {
         form.reset({
-          name: asset.name,
-          serialNumber: asset.serialNumber,
-          category: asset.category as AssetCategory,
-          status: asset.status as AssetStatus,
-          acquisitionDate: asset.acquisitionDate,
+          name: asset.name || "",
+          serialNumber: asset.serialNumber || "",
+          category: (asset.category as AssetCategory) || "Computador",
+          status: (asset.status as AssetStatus) || "Disponível",
+          acquisitionDate: asset.acquisitionDate || "",
           description: asset.description || "",
         });
       } else {
@@ -101,11 +99,13 @@ export function AssetFormDialog({
     onClose();
   };
 
+  const isEditing = !!asset?.id;
+
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{asset ? "Editar Ativo" : "Novo Ativo"}</DialogTitle>
+          <DialogTitle>{isEditing ? "Editar Ativo" : "Novo Ativo"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -242,7 +242,7 @@ export function AssetFormDialog({
                 Cancelar
               </Button>
               <Button type="submit">
-                {asset ? "Salvar Alterações" : "Cadastrar Ativo"}
+                {isEditing ? "Salvar Alterações" : "Cadastrar Ativo"}
               </Button>
             </div>
           </form>

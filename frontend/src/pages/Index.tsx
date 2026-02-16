@@ -22,7 +22,8 @@ const Index = () => {
   } = useAssets();
 
   const [formOpen, setFormOpen] = useState(false);
-  const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
+
+  const [editingAsset, setEditingAsset] = useState<Partial<Asset> | null>(null);
 
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
@@ -31,8 +32,18 @@ const Index = () => {
     setFormOpen(true);
   };
 
+  const handleDuplicate = (asset: Asset) => {
+    const { id, ...assetData } = asset;
+
+    setEditingAsset({
+      ...assetData,
+      name: `${assetData.name} - Cópia`,
+    });
+    setFormOpen(true);
+  };
+
   const handleSave = (data: Omit<Asset, "id">) => {
-    if (editingAsset) {
+    if (editingAsset?.id) {
       updateAsset(editingAsset.id, data);
       toast.success("Ativo atualizado com sucesso!");
     } else {
@@ -84,10 +95,12 @@ const Index = () => {
       <main className="container mx-auto px-4 py-6 space-y-6">
         <StatsCards stats={stats} />
         <AssetFilters filters={filters} onChange={setFilters} />
+
         <AssetTable
           assets={assets}
           onEdit={handleEdit}
           onDelete={setDeleteId}
+          onDuplicate={handleDuplicate}
         />
       </main>
 

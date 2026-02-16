@@ -9,12 +9,13 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Copy } from "lucide-react";
 
 interface AssetTableProps {
   assets: Asset[];
   onEdit: (asset: Asset) => void;
   onDelete: (id: number) => void;
+  onDuplicate: (asset: Asset) => void;
 }
 
 const statusVariant: Record<string, string> = {
@@ -26,7 +27,12 @@ const statusVariant: Record<string, string> = {
   Descartado: "bg-red-100 text-red-700 border-red-200 hover:bg-red-100",
 };
 
-export function AssetTable({ assets, onEdit, onDelete }: AssetTableProps) {
+export function AssetTable({
+  assets,
+  onEdit,
+  onDelete,
+  onDuplicate,
+}: AssetTableProps) {
   if (assets.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
@@ -80,16 +86,29 @@ export function AssetTable({ assets, onEdit, onDelete }: AssetTableProps) {
                   <Button
                     variant="ghost"
                     size="icon"
+                    onClick={() => onDuplicate(asset)}
+                    title="Duplicar"
+                    className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => onEdit(asset)}
-                    className="h-8 w-8"
+                    title="Editar"
+                    className="h-8 w-8 text-gray-800 hover:text-gray-900 hover:bg-gray-100"
                   >
                     <Pencil className="h-4 w-4" />
                   </Button>
+
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => onDelete(asset.id)}
-                    className="h-8 w-8 text-destructive hover:text-destructive"
+                    title="Excluir"
+                    className="h-8 w-8 text-destructive/90 hover:text-destructive hover:bg-destructive/10"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
